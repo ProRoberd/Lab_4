@@ -1,0 +1,124 @@
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Форма</title>
+</head>
+<body>
+    <h2>Форма</h2>
+    <form id="userForm">
+        <label>Ім'я:</label>
+        <input type="text" id="firstName" required><br><br>
+
+        <label>Прізвище:</label>
+        <input type="text" id="lastName" required><br><br>
+
+        <label>Вік:</label>
+        <input type="number" id="age" required><br><br>
+
+        <label>Пароль:</label>
+        <input type="password" id="password" required>
+        <button type="button" onclick="togglePassword()">👁</button><br><br>
+
+        <fieldset>
+            <legend>Захоплення:</legend>
+            <input type="checkbox" name="hobby" value="Спорт"> Спорт
+            <input type="checkbox" name="hobby" value="Музика"> Музика
+            <input type="checkbox" name="hobby" value="Подорожі"> Подорожі
+            <input type="checkbox" name="hobby" value="Читання"> Читання
+            <input type="checkbox" name="hobby" value="Інше" onclick="toggleOtherHobby(this)"> Інше:
+            <input type="text" id="otherHobby" style="display:none;"><br>
+        </fieldset><br>
+
+        <label>Країна:</label>
+        <select id="country" onchange="updateCities()"></select>
+        <input type="text" id="customCountry" placeholder="Введіть свою країну" style="display:none;"><br><br>
+
+        <label>Місто:</label>
+        <select id="city"></select>
+        <input type="text" id="customCity" placeholder="Введіть своє місто" style="display:none;"><br><br>
+
+        <label>Коментар:</label><br>
+        <textarea id="comment" rows="4" cols="50"></textarea><br><br>
+
+        <button type="submit">Зберегти</button>
+        <button type="reset">Очистити</button>
+    </form>
+
+    <script>
+        const countries = {
+            "Україна": ["Київ", "Львів", "Одеса", "Харків"],
+            "Польща": ["Варшава", "Краків", "Вроцлав"],
+            "Німеччина": ["Берлін", "Мюнхен", "Кельн"],
+            "Італія": ["Рим", "Мілан", "Неаполь"],
+            "Інше": []
+        };
+
+        const countrySelect = document.getElementById("country");
+        const citySelect = document.getElementById("city");
+
+        for (let country in countries) {
+            const opt = document.createElement("option");
+            opt.value = country;
+            opt.text = country;
+            countrySelect.appendChild(opt);
+        }
+
+        function updateCities() {
+            const selected = countrySelect.value;
+            const customInput = document.getElementById("customCountry");
+            const cityInput = document.getElementById("customCity");
+
+            if (selected === "Інше") {
+                customInput.style.display = "inline";
+                citySelect.style.display = "none";
+                cityInput.style.display = "inline";
+            } else {
+                customInput.style.display = "none";
+                cityInput.style.display = "none";
+                citySelect.style.display = "inline";
+                citySelect.innerHTML = "";
+                countries[selected].forEach(city => {
+                    const option = document.createElement("option");
+                    option.text = city;
+                    option.value = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        function togglePassword() {
+            const input = document.getElementById("password");
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
+        function toggleOtherHobby(checkbox) {
+            document.getElementById("otherHobby").style.display = checkbox.checked ? "inline" : "none";
+        }
+
+        document.getElementById("userForm").onsubmit = function(e) {
+            e.preventDefault();
+
+            const data = {
+                firstName: document.getElementById("firstName").value,
+                lastName: document.getElementById("lastName").value,
+                age: document.getElementById("age").value,
+                country: countrySelect.value === "Інше" ? document.getElementById("customCountry").value : countrySelect.value,
+                city: countrySelect.value === "Інше" ? document.getElementById("customCity").value : citySelect.value,
+                hobbies: Array.from(document.querySelectorAll('input[name="hobby"]:checked')).map(cb => cb.value).join(", ") + (document.getElementById("otherHobby").value || ""),
+                comment: document.getElementById("comment").value
+            };
+
+            const saved = JSON.parse(localStorage.getItem("users") || "[]");
+            saved.push(data);
+            localStorage.setItem("users", JSON.stringify(saved));
+
+            alert("Збережено!");
+            this.reset();
+            document.getElementById("otherHobby").style.display = "none";
+            updateCities();
+        };
+
+        updateCities();
+    </script>
+</body>
+</html>

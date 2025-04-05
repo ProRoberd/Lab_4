@@ -1,0 +1,53 @@
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Таблиця</title>
+</head>
+<body>
+    <h2>Таблиця</h2>
+    <table border="1">
+        <caption>Дані користувачів</caption>
+        <thead>
+            <tr>
+                <th>Ім'я</th>
+                <th>Прізвище</th>
+                <th>Вік</th>
+                <th>Країна</th>
+                <th>Місто</th>
+                <th>Захоплення</th>
+                <th>Коментар</th>
+            </tr>
+        </thead>
+        <tbody id="dataRows"></tbody>
+        <tfoot>
+            <tr><td colspan="7">Кінець списку</td></tr>
+        </tfoot>
+    </table>
+    <br>
+    <button onclick="clearTable()">Очистити таблицю</button>
+
+    <script>
+        const data = JSON.parse(localStorage.getItem("users") || "[]");
+        const tbody = document.getElementById("dataRows");
+
+        data.forEach(user => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${user.firstName}</td>
+                <td>${user.lastName}</td>
+                <td>${user.age}</td>
+                <td>${user.country}</td>
+                <td>${user.city}</td>
+                <td>${user.hobbies}</td>
+                <td>${user.comment}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        function clearTable() {
+            localStorage.removeItem("users");
+            location.reload();
+        }
+    </script>
+</body>
+</html>
